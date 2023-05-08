@@ -23,6 +23,9 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - containers
+  - split
 
 executables:
   simple-haskell-project-exe:
