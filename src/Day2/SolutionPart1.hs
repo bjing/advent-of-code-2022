@@ -1,9 +1,8 @@
 module Day2.SolutionPart1 where
 
-type Score = Int
+import           Data.Maybe (mapMaybe)
 
-data Input = X | Y | Z | A | B | C
-  deriving (Eq, Read, Show)
+type Score = Int
 
 data Shape = Rock | Paper | Scissors
   deriving (Eq, Show)
@@ -11,23 +10,23 @@ data Shape = Rock | Paper | Scissors
 loadInput :: FilePath -> IO [(Shape, Shape)]
 loadInput fp = do
   content <- readFile fp
-  let inputs = map (mapTuple inputToShape . listToTuple . words) $ lines content
+  let inputs = mapMaybe (parseInput . words) $ lines content
   pure inputs
   where
-    mapTuple :: (a -> b) -> (a, a) -> (b, b)
-    mapTuple f (a1, a2) = (f a1, f a2)
+    parseInput :: [String] -> Maybe (Shape, Shape)
+    parseInput [x, y] =
+      case (inputToShape x, inputToShape y) of
+        (Just a, Just b) -> Just (a, b)
+        _                -> Nothing
 
-    listToTuple :: [String] -> (String, String)
-    listToTuple [x, y] = (x, y)
-    listToTuple _      = error "List needs to have exactly two elments"
-
-    inputToShape :: String -> Shape
-    inputToShape "X" = Rock
-    inputToShape "Y" = Paper
-    inputToShape "Z" = Scissors
-    inputToShape "A" = Rock
-    inputToShape "B" = Paper
-    inputToShape "C" = Scissors
+    inputToShape :: String -> Maybe Shape
+    inputToShape "X" = Just Rock
+    inputToShape "Y" = Just Paper
+    inputToShape "Z" = Just Scissors
+    inputToShape "A" = Just Rock
+    inputToShape "B" = Just Paper
+    inputToShape "C" = Just Scissors
+    inputToShape _   = Nothing
 
 evaluateInput :: (Shape, Shape) -> Score
 evaluateInput (Rock, Rock)         = 4

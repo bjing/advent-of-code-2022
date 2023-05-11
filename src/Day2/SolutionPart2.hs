@@ -1,5 +1,7 @@
 module Day2.SolutionPart2 where
 
+import           Data.Maybe (mapMaybe)
+
 type Score = Int
 
 data Outcome = Lose | Draw | Win
@@ -11,28 +13,27 @@ data Shape = Rock | Paper | Scissors
 loadInput :: FilePath -> IO [(Shape, Outcome)]
 loadInput fp = do
   content <- readFile fp
-  let inputs = map (parseTuple . listToTuple . words) $ lines content
+  let inputs = mapMaybe (parseInput . words) $ lines content
   pure inputs
   where
-    mapTuple :: (a -> b) -> (a, a) -> (b, b)
-    mapTuple f (a1, a2) = (f a1, f a2)
+    parseInput :: [String] -> Maybe (Shape, Outcome)
+    parseInput [a, b] =
+      case (parseShape a, parseOutcome b) of
+        (Just x, Just y) -> Just (x, y)
+        _                -> Nothing
+    parseInput _ = Nothing
 
-    listToTuple :: [String] -> (String, String)
-    listToTuple [x, y] = (x, y)
-    listToTuple _      = error "List needs to have exactly two elments"
+    parseShape :: String -> Maybe Shape
+    parseShape "A" = Just Rock
+    parseShape "B" = Just Paper
+    parseShape "C" = Just Scissors
+    parseShape _   = Nothing
 
-    parseTuple :: (String, String) -> (Shape, Outcome)
-    parseTuple (a, b) = (parseShape a, parseOutcome b)
-
-    parseShape :: String -> Shape
-    parseShape "A" = Rock
-    parseShape "B" = Paper
-    parseShape "C" = Scissors
-
-    parseOutcome :: String -> Outcome
-    parseOutcome "X" = Lose
-    parseOutcome "Y" = Draw
-    parseOutcome "Z" = Win
+    parseOutcome :: String -> Maybe Outcome
+    parseOutcome "X" = Just Lose
+    parseOutcome "Y" = Just Draw
+    parseOutcome "Z" = Just Win
+    parseOutcome _   = Nothing
 
 evaluateInput :: (Shape, Outcome) -> Score
 evaluateInput (Rock, Lose)     = 3
