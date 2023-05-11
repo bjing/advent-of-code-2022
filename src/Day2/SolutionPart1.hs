@@ -1,4 +1,4 @@
-module Day2.Solution where
+module Day2.SolutionPart1 where
 
 type Score = Int
 
