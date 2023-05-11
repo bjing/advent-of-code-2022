@@ -26,6 +26,7 @@ library:
   dependencies:
   - containers
   - split
+  - text
 
 executables:
   simple-haskell-project-exe:
