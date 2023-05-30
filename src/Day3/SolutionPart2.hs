@@ -7,9 +7,11 @@ import qualified Data.Set   as S
 
 type Rucksack = String
 
-type Item = Char
+type Badge = Char
 
-getBadgeFromGroup :: [Rucksack] -> Item
+type Priority = Int
+
+getBadgeFromGroup :: [Rucksack] -> Badge
 getBadgeFromGroup sacks =
   head $ foldr L.intersect (concat sacks) sacks
 
@@ -23,12 +25,15 @@ loadInput fp = do
     groupRucksacks (x : y : z : rest) res = groupRucksacks rest ([x, y, z] : res)
     groupRucksacks [] res = res
 
-priorityMapping :: M.Map Char Int
+priorityMapping :: M.Map Badge Priority
 priorityMapping = M.fromList $ zip ['a' .. 'z'] [1 ..] ++ zip ['A' .. 'Z'] [27 ..]
+
+convertBadgesToPriorities :: [Badge] -> [Priority]
+convertBadgesToPriorities = Maybe.mapMaybe (`M.lookup` priorityMapping)
 
 runDay3Part2 :: IO ()
 runDay3Part2 = do
   rucksacks <- loadInput "src/Day3/input.txt"
-  let commonItemsForSacks = map getBadgeFromGroup (filter (/= []) rucksacks)
-  let priorities = Maybe.mapMaybe (`M.lookup` priorityMapping) commonItemsForSacks
+  let badges = map getBadgeFromGroup (filter (/= []) rucksacks)
+  let priorities = convertBadgesToPriorities badges
   print $ sum priorities

@@ -9,8 +9,10 @@ type Rucksack = String
 
 type Item = Char
 
-getCommonFromRuckSack :: Rucksack -> Item
-getCommonFromRuckSack s =
+type Priority = Int
+
+getCommonItemFromRuckSack :: Rucksack -> Item
+getCommonItemFromRuckSack s =
   S.elemAt 0 $ S.fromList first `S.intersection` S.fromList second
   where
     (first, second) = L.splitAt (length s `div` 2) s
@@ -20,12 +22,15 @@ loadInput fp = do
   content <- readFile fp
   pure $ lines content
 
-priorityMapping :: M.Map Char Int
+priorityMapping :: M.Map Item Priority
 priorityMapping = M.fromList $ zip ['a' .. 'z'] [1 ..] ++ zip ['A' .. 'Z'] [27 ..]
+
+convertItemsToPriorities :: [Item] -> [Priority]
+convertItemsToPriorities = Maybe.mapMaybe (`M.lookup` priorityMapping)
 
 runDay3Part1 :: IO ()
 runDay3Part1 = do
   rucksacks <- loadInput "src/Day3/input.txt"
-  let commonItemsForSacks = map getCommonFromRuckSack rucksacks
-  let priorities = Maybe.mapMaybe (`M.lookup` priorityMapping) commonItemsForSacks
+  let commonItems = map getCommonItemFromRuckSack rucksacks
+  let priorities = convertItemsToPriorities commonItems
   print $ sum priorities
