@@ -1,15 +1,15 @@
-module Day4.SolutionPart1 where
+module Day4.SolutionPart2 where
 
 import qualified Data.List.Split as S
 import qualified Data.List as L
 
-runDay4Part1 :: IO ()
-runDay4Part1 = do
+runDay4Part2 :: IO ()
+runDay4Part2 = do
   input <- loadInput "src/Day4/input.txt"
   let pairs = map extractPairsFromInputLine input
-  let containedPairs = map contained pairs
-  let numPairsContained = length $ filter id containedPairs
-  putStrLn $ "Number of pairs containing each other: " ++ show numPairsContained
+  let overlaps = map overlap pairs
+  let numOverlaps = length $ filter (not . null) overlaps
+  putStrLn $ "Number of overlaps: " ++ show numOverlaps
 
 loadInput :: FilePath -> IO [String]
 loadInput fp = do
@@ -26,5 +26,5 @@ extractPairsFromInputLine = genList . map stringToInt . S.splitOneOf "-,"
     stringToInt ss = do 
       read ss :: Int
   
-contained :: ([Int], [Int]) -> Bool
-contained (first, second) = first `L.isInfixOf` second || second `L.isInfixOf` first
+overlap :: ([Int], [Int]) -> [Int]
+overlap (first, second) = first `L.intersect` second
