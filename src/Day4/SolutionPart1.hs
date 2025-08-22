@@ -7,9 +7,9 @@ runDay4Part1 :: IO ()
 runDay4Part1 = do
   input <- loadInput "src/Day4/input.txt"
   let pairs = map extractPairsFromInputLine input
-  let overlaps = map overlap pairs
-  let numOverlaps = length $ filter id overlaps
-  putStrLn $ "Number of overlaps: " ++ show numOverlaps
+  let containedPairs = map contained pairs
+  let numPairsContained = length $ filter id containedPairs
+  putStrLn $ "Number of pairs containing each other: " ++ show numPairsContained
 
 loadInput :: FilePath -> IO [String]
 loadInput fp = do
@@ -26,5 +26,5 @@ extractPairsFromInputLine = genList . map stringToInt . S.splitOneOf "-,"
     stringToInt ss = do 
       read ss :: Int
   
-overlap :: ([Int], [Int]) -> Bool
-overlap (first, second) = first `L.isInfixOf` second || second `L.isInfixOf` first
+contained :: ([Int], [Int]) -> Bool
+contained (first, second) = first `L.isInfixOf` second || second `L.isInfixOf` first
