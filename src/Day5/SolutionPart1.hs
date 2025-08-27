@@ -22,7 +22,8 @@ runDay5Part1 = do
     inputLines <- loadInput "src/Day5/input.txt"
     let moves = parseInput inputLines
     let finalStack = foldl rearrange initStacks moves
-    print finalStack
+    let result = head <$> M.elems finalStack
+    print result
 
 loadInput :: FilePath -> IO [String]
 loadInput fp = do
@@ -30,16 +31,21 @@ loadInput fp = do
     pure $ lines content
 
 parseInput :: [String] -> [Move]
-parseInput lines = parseDataLine <$> lines
+parseInput lines = parseMove <$> filteredLines
     where
         filteredLines = filter (List.isPrefixOf "move") lines
 
-parseDataLine :: String -> Move
-parseDataLine _ = Move {
-    cratesToMove = 1,
-    stackFrom = 5,
-    stackTo = 9
-}
+parseMove :: String -> Move
+parseMove s =
+  case words s of
+    ["move", x, "from", y, "to", z] -> 
+        Move {
+            cratesToMove = read x, 
+            stackFrom = read y, 
+            stackTo = read z
+        }
+    _ -> error "Invalid format"
+
 
 initStacks :: Stacks
 initStacks = M.fromList [
