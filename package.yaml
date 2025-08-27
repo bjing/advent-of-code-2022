@@ -1,10 +1,10 @@
-name:                simple-haskell-project
+name:                advent-of-code
 version:             0.1.0.0
-github:              "githubuser/simple-haskell-project"
+github:              "bjing/advent-of-code-2022"
 license:             MIT
-author:              "Author name here"
-maintainer:          "example@example.com"
-copyright:           "2021 Author name here"
+author:              "Brian Jing"
+maintainer:          "brian.jing.dev@egmail.com"
+copyright:           "2021 Brian Jing"
 
 extra-source-files:
 - README.md
@@ -16,7 +16,7 @@ extra-source-files:
 # To avoid duplicated efforts in documentation and dealing with the
 # complications of embedding Haddock markup inside cabal files, it is
 # common to point users to the README.md file.
-description:         Simple Haskell project template
+description:         Advent of Code 2022 Solutions
 
 dependencies:
 - base >= 4.7 && < 5
@@ -29,7 +29,7 @@ library:
   - text
 
 executables:
-  simple-haskell-project-exe:
+  advent-of-code-exe:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
@@ -38,10 +38,9 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - base
-    - simple-haskell-project
 
 tests:
-  simple-haskell-project-test:
+  advent-of-code-test:
     main:                Spec.hs
     source-dirs:         test
     ghc-options:
@@ -50,5 +49,4 @@ tests:
     - -with-rtsopts=-N
     dependencies:
     - base
-    - simple-haskell-project
     - hspec
