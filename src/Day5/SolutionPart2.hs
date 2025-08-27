@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Day5.SolutionPart1 where
+module Day5.SolutionPart2 where
     
 -- TODO Refactor this module to handle state better
 
@@ -19,8 +19,8 @@ data Move = Move {
     stackTo :: Int
 } deriving Show
 
-runDay5Part1 :: IO ()
-runDay5Part1 = do
+runDay5Part2 :: IO ()
+runDay5Part2 = do
     inputLines <- loadInput "src/Day5/input.txt"
     let moves = parseInput inputLines
     let finalStack = foldl rearrange initStacks moves
@@ -72,10 +72,10 @@ rearrange stacks move =
         updateStacks stacks [(from, newFrom), (to, newTo)]
         
 moveStack :: Int -> Stack -> Stack -> (Stack, Stack)
-moveStack 0 fromStack toStack = (fromStack, toStack)
-moveStack _ [] toStack = ([], toStack)
-moveStack movesLeft fromStack@(hf:fs) toStack = 
-    moveStack (movesLeft - 1) fs (hf:toStack)
+moveStack numCratesToMove fromStack toStack = 
+    let cratesMoved = take numCratesToMove fromStack
+    in 
+        (drop numCratesToMove fromStack, cratesMoved ++ toStack)
 
 updateStacks :: Stacks -> [(Int, String)] -> Stacks
 updateStacks stacks [] = stacks
