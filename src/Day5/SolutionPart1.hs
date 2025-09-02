@@ -9,10 +9,11 @@ import Data.Map (Map)
 import qualified Data.Maybe as Maybe
 import qualified Data.List as List
 import qualified Data.Text as T
+import Control.Monad.State.Lazy
 
 type Stack = String
-type Stacks = Map Int Stack
-
+type StackMap = Map Int Stack
+type Stacks = State StackMap ()
 data Move = Move {
     cratesToMove :: Int,
     stackFrom :: Int, 
@@ -23,7 +24,8 @@ runDay5Part1 :: IO ()
 runDay5Part1 = do
     inputLines <- loadInput "src/Day5/input.txt"
     let moves = parseInput inputLines
-    let finalStack = foldl rearrange initStacks moves
+    let stacks = mapM_ rearrange moves
+    let finalStack = execState stacks initStacks
     let result = head <$> M.elems finalStack
     print result
 
@@ -48,8 +50,7 @@ parseMove s =
         }
     _ -> error "Invalid format"
 
-
-initStacks :: Stacks
+initStacks :: StackMap
 initStacks = M.fromList [
     (1, "CFBLDPZS"),
     (2, "BWHPGVN"),
@@ -61,28 +62,29 @@ initStacks = M.fromList [
     (8, "TWSF"),
     (9, "RCN")]
 
-rearrange :: Stacks -> Move -> Stacks
-rearrange stacks move = 
+rearrange :: Move -> Stacks
+rearrange move = do
+    stacks <- get
     let from = stackFrom move
-        to = stackTo move
-        fromStack = M.lookup from stacks
-        toStack = M.lookup to stacks
-        (newFrom, newTo) = Maybe.fromJust $ moveStack (cratesToMove move) <$> fromStack <*> toStack 
-    in
-        updateStacks stacks [(from, newFrom), (to, newTo)]
-        
+    let to = stackTo move
+    let fromStack = M.lookup from stacks
+    let toStack = M.lookup to stacks
+    let (newFrom, newTo) = Maybe.fromJust $ moveStack (cratesToMove move) <$> fromStack <*> toStack 
+    updateStacks [(from, newFrom), (to, newTo)]
+
+updateStacks :: [(Int, String)] -> Stacks
+updateStacks [] = do
+    pure ()
+updateStacks ((index, stack):updates) = do
+    stacks <- get
+    put $ M.insert index stack stacks
+    updateStacks updates
+
 moveStack :: Int -> Stack -> Stack -> (Stack, Stack)
 moveStack 0 fromStack toStack = (fromStack, toStack)
 moveStack _ [] toStack = ([], toStack)
 moveStack movesLeft fromStack@(hf:fs) toStack = 
     moveStack (movesLeft - 1) fs (hf:toStack)
-
-updateStacks :: Stacks -> [(Int, String)] -> Stacks
-updateStacks stacks [] = stacks
-updateStacks stacks ((index, stack):updates) = 
-    updateStacks updatedStacks updates
-    where 
-        updatedStacks = M.insert index stack stacks
-    
+   
 processInputLine :: String -> String
 processInputLine = T.unpack . T.replace "to" "" . T.replace "from" "" . T.replace "move" "" . T.pack
